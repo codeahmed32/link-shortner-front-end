@@ -50,14 +50,58 @@ export default function App() {
   };
 
   // Clipboard functionality
-  const handleCopy = (id, text) => {
-    navigator.clipboard.writeText(text).then(() => {
+const handleCopy = (id, text) => {
+  // Fallback method for unsecure network IPs and mobile browsers
+  const copyToClipboardFallback = (str) => {
+    const el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    
+    // Check if iOS to handle selection correctly
+    const selected = document.getSelection().rangeCount > 0 
+      ? document.getSelection().getRangeAt(0) 
+      : false;
+    
+    el.select();
+    el.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+      document.execCommand('copy');
       setCopiedId(id);
-      setTimeout(() => {
-        setCopiedId(null);
-      }, 2000);
-    });
+    } catch (err) {
+      console.error('Fallback copy failed', err);
+    }
+    
+    document.body.removeChild(el);
+    if (selected) {
+      document.getSelection().removeAllRanges();
+      document.getSelection().addRange(selected);
+    }
   };
+
+  // Main logic checking context compatibility
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopiedId(id);
+      })
+      .catch(() => {
+        // If modern API fails due to permission/context, run fallback
+        copyToClipboardFallback(text);
+      });
+  } else {
+    // Direct execution for non-https/network domains on mobile
+    copyToClipboardFallback(text);
+  }
+
+  // Clear visual status after 2 seconds
+  setTimeout(() => {
+    setCopiedId(null);
+  }, 2000);
+};
 
   return (
     <div className="font-sans min-h-screen bg-surface text-on-surface selection:bg-primary/20 selection:text-primary overflow-x-hidden antialiased flex flex-col">
