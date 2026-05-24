@@ -1,6 +1,6 @@
-import React, { useState } from "react";
 import axios from "axios";
-import { Link2, Copy, Check, QrCode, Zap, ShieldCheck, BarChart3, Menu, X, Globe, Lock, ArrowRight, CornerDownRight } from "lucide-react";
+import { BarChart3, Check, Copy, Link2, Menu, ShieldCheck, X, Zap } from "lucide-react";
+import { useState } from "react";
 
 export default function App() {
   const [longUrl, setLongUrl] = useState("");
@@ -8,7 +8,6 @@ export default function App() {
   const [showResult, setShowResult] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [isShortening, setIsShortening] = useState(false);
-  const [qrCodeModal, setQrCodeModal] = useState(null); 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -26,9 +25,9 @@ export default function App() {
 
       if (response.data.ok) {
         const newLink = {
-          id: Date.now().toString(), 
+          id: Date.now().toString(),
           original: longUrl,
-          short: response.data.shortUrl 
+          short: response.data.shortUrl
         };
 
         setShortenedLinks([newLink, ...shortenedLinks]);
@@ -54,21 +53,21 @@ export default function App() {
       el.style.position = 'absolute';
       el.style.left = '-9999px';
       document.body.appendChild(el);
-      
-      const selected = document.getSelection().rangeCount > 0 
-        ? document.getSelection().getRangeAt(0) 
+
+      const selected = document.getSelection().rangeCount > 0
+        ? document.getSelection().getRangeAt(0)
         : false;
-      
+
       el.select();
       el.setSelectionRange(0, 99999);
-      
+
       try {
         document.execCommand('copy');
         setCopiedId(id);
       } catch (err) {
         console.error('Fallback copy failed', err);
       }
-      
+
       document.body.removeChild(el);
       if (selected) {
         document.getSelection().removeAllRanges();
@@ -95,7 +94,7 @@ export default function App() {
 
   return (
     <div className="font-sans min-h-screen bg-surface text-on-surface selection:bg-primary/20 selection:text-primary overflow-x-hidden antialiased flex flex-col">
-      
+
       <header className="bg-surface/90 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant transition-all duration-200">
         <nav className="flex justify-between items-center w-full h-20 px-6 max-w-[1248px] mx-auto">
           <div className="flex items-center gap-2">
@@ -121,7 +120,7 @@ export default function App() {
             </button>
           </div>
 
-          <button 
+          <button
             className="md:hidden p-2 text-on-surface hover:text-primary cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
@@ -161,7 +160,7 @@ export default function App() {
 
             <div className="max-w-3xl mx-auto mb-4">
               <form onSubmit={handleShorten} className="bg-surface-container-lowest p-2 rounded-xl border border-outline-variant/60 flex flex-col md:flex-row gap-2 shadow-[0_4px_20px_rgba(79,70,229,0.06)] focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary transition-all">
-                <input 
+                <input
                   type="url"
                   required
                   value={longUrl}
@@ -169,7 +168,7 @@ export default function App() {
                   placeholder="Paste your long URL here..."
                   className="flex-1 w-full bg-transparent px-4 py-3 md:py-4 border-none text-base outline-none focus:outline-none placeholder:text-outline text-on-surface"
                 />
-                <button 
+                <button
                   type="submit"
                   disabled={isShortening}
                   className="w-full md:w-auto px-10 py-3 md:py-4 bg-primary-container text-on-primary font-semibold text-base rounded-lg hover:bg-primary active:scale-97 transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap min-w-[180px]"
@@ -190,7 +189,7 @@ export default function App() {
             {showResult && shortenedLinks.length > 0 && (
               <div className="max-w-2xl mx-auto mb-6 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {shortenedLinks.map((item) => (
-                  <div 
+                  <div
                     key={item.id}
                     className="bg-surface-container-low border border-primary-container/20 hover:border-primary-container/40 rounded-xl p-4 md:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm group hover:shadow-md transition-all duration-200"
                   >
@@ -208,13 +207,12 @@ export default function App() {
                     </div>
 
                     <div className="flex items-center gap-2.5 w-full md:w-auto">
-                      <button 
+                      <button
                         onClick={() => handleCopy(item.id, item.short)}
-                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 h-10 px-4 rounded-lg font-medium text-sm border transition-all cursor-pointer ${
-                          copiedId === item.id 
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
-                            : "bg-surface-container-highest text-on-surface-variant hover:text-primary border-outline-variant hover:border-primary/30"
-                        }`}
+                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 h-10 px-4 rounded-lg font-medium text-sm border transition-all cursor-pointer ${copiedId === item.id
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-surface-container-highest text-on-surface-variant hover:text-primary border-outline-variant hover:border-primary/30"
+                          }`}
                       >
                         {copiedId === item.id ? (
                           <>
