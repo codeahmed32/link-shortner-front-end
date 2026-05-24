@@ -4,7 +4,6 @@ import { Link2, Copy, Check, QrCode, Zap, ShieldCheck, BarChart3, Menu, X, Globe
 
 export default function App() {
   const [longUrl, setLongUrl] = useState("");
-  // Initial array ko khali rakh rahe hain taake database entries yahan append hon
   const [shortenedLinks, setShortenedLinks] = useState([]);
   const [showResult, setShowResult] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -13,10 +12,8 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Base URL definition (.env fallback mechanism)
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5050";
 
-  // Actual Axios Shorten Action
   const handleShorten = async (e) => {
     e.preventDefault();
     if (!longUrl.trim()) return;
@@ -25,14 +22,13 @@ export default function App() {
     setErrorMessage("");
 
     try {
-      // Direct API invocation without fake delay automation
       const response = await axios.post(`${BACKEND_URL}/save`, { longUrl });
 
       if (response.data.ok) {
         const newLink = {
-          id: Date.now().toString(), // local list rendering key
+          id: Date.now().toString(), 
           original: longUrl,
-          short: response.data.shortURL // live database shortened domain link
+          short: response.data.shortUrl 
         };
 
         setShortenedLinks([newLink, ...shortenedLinks]);
@@ -43,73 +39,65 @@ export default function App() {
       }
     } catch (err) {
       console.error("API Connection Error:", err);
-      setErrorMessage("Backend server unreachable.");
+      const serverMessage = err.response?.data?.message || "Backend server unreachable.";
+      setErrorMessage(serverMessage);
     } finally {
       setIsShortening(false);
     }
   };
 
-  // Clipboard functionality
-const handleCopy = (id, text) => {
-  // Fallback method for unsecure network IPs and mobile browsers
-  const copyToClipboardFallback = (str) => {
-    const el = document.createElement('textarea');
-    el.value = str;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    
-    // Check if iOS to handle selection correctly
-    const selected = document.getSelection().rangeCount > 0 
-      ? document.getSelection().getRangeAt(0) 
-      : false;
-    
-    el.select();
-    el.setSelectionRange(0, 99999); // For mobile devices
-    
-    try {
-      document.execCommand('copy');
-      setCopiedId(id);
-    } catch (err) {
-      console.error('Fallback copy failed', err);
-    }
-    
-    document.body.removeChild(el);
-    if (selected) {
-      document.getSelection().removeAllRanges();
-      document.getSelection().addRange(selected);
-    }
-  };
-
-  // Main logic checking context compatibility
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => {
+  const handleCopy = (id, text) => {
+    const copyToClipboardFallback = (str) => {
+      const el = document.createElement('textarea');
+      el.value = str;
+      el.setAttribute('readonly', '');
+      el.style.position = 'absolute';
+      el.style.left = '-9999px';
+      document.body.appendChild(el);
+      
+      const selected = document.getSelection().rangeCount > 0 
+        ? document.getSelection().getRangeAt(0) 
+        : false;
+      
+      el.select();
+      el.setSelectionRange(0, 99999);
+      
+      try {
+        document.execCommand('copy');
         setCopiedId(id);
-      })
-      .catch(() => {
-        // If modern API fails due to permission/context, run fallback
-        copyToClipboardFallback(text);
-      });
-  } else {
-    // Direct execution for non-https/network domains on mobile
-    copyToClipboardFallback(text);
-  }
+      } catch (err) {
+        console.error('Fallback copy failed', err);
+      }
+      
+      document.body.removeChild(el);
+      if (selected) {
+        document.getSelection().removeAllRanges();
+        document.getSelection().addRange(selected);
+      }
+    };
 
-  // Clear visual status after 2 seconds
-  setTimeout(() => {
-    setCopiedId(null);
-  }, 2000);
-};
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          setCopiedId(id);
+        })
+        .catch(() => {
+          copyToClipboardFallback(text);
+        });
+    } else {
+      copyToClipboardFallback(text);
+    }
+
+    setTimeout(() => {
+      setCopiedId(null);
+    }, 2000);
+  };
 
   return (
     <div className="font-sans min-h-screen bg-surface text-on-surface selection:bg-primary/20 selection:text-primary overflow-x-hidden antialiased flex flex-col">
       
-      {/* TopNavBar */}
       <header className="bg-surface/90 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant transition-all duration-200">
         <nav className="flex justify-between items-center w-full h-20 px-6 max-w-[1248px] mx-auto">
-          {/* Logo */}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
               <Link2 size={18} className="rotate-45" />
@@ -117,7 +105,6 @@ const handleCopy = (id, text) => {
             <span className="font-display text-2xl font-bold text-primary tracking-tight">ShortenIt</span>
           </div>
 
-          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-10">
             <a href="#" className="text-primary font-semibold border-b-2 border-primary pb-1 font-sans text-sm">Features</a>
             <a href="#" className="text-on-surface-variant font-medium text-sm hover:text-primary transition-colors duration-200">Solutions</a>
@@ -125,7 +112,6 @@ const handleCopy = (id, text) => {
             <a href="#" className="text-on-surface-variant font-medium text-sm hover:text-primary transition-colors duration-200">Enterprise</a>
           </div>
 
-          {/* Actions */}
           <div className="hidden sm:flex items-center gap-6">
             <button className="text-on-surface font-semibold text-sm hover:text-primary hover:opacity-100 opacity-90 transition-all cursor-pointer">
               Log In
@@ -135,7 +121,6 @@ const handleCopy = (id, text) => {
             </button>
           </div>
 
-          {/* Mobile Menu Icon */}
           <button 
             className="md:hidden p-2 text-on-surface hover:text-primary cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -144,7 +129,6 @@ const handleCopy = (id, text) => {
           </button>
         </nav>
 
-        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-outline-variant bg-surface px-6 py-6 absolute w-full left-0 top-20 shadow-lg flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
             <a href="#" className="text-primary font-bold text-base py-1">Features</a>
@@ -161,7 +145,6 @@ const handleCopy = (id, text) => {
       </header>
 
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="relative pt-20 pb-12 px-6 text-center overflow-hidden">
           <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
             backgroundImage: "radial-gradient(#4f46e5 0.5px, transparent 0.5px)",
@@ -176,7 +159,6 @@ const handleCopy = (id, text) => {
               Transform long, complex URLs into clean, manageable links. Professional-grade link management for high-performance teams.
             </p>
 
-            {/* URL Input Form */}
             <div className="max-w-3xl mx-auto mb-4">
               <form onSubmit={handleShorten} className="bg-surface-container-lowest p-2 rounded-xl border border-outline-variant/60 flex flex-col md:flex-row gap-2 shadow-[0_4px_20px_rgba(79,70,229,0.06)] focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary transition-all">
                 <input 
@@ -201,12 +183,10 @@ const handleCopy = (id, text) => {
               </form>
             </div>
 
-            {/* Client Side Error Indicator */}
             {errorMessage && (
               <p className="text-red-500 font-medium text-sm mb-6 animate-pulse">{errorMessage}</p>
             )}
 
-            {/* Dynamic Results Card Mapping */}
             {showResult && shortenedLinks.length > 0 && (
               <div className="max-w-2xl mx-auto mb-6 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {shortenedLinks.map((item) => (
@@ -248,7 +228,6 @@ const handleCopy = (id, text) => {
                           </>
                         )}
                       </button>
-
                     </div>
                   </div>
                 ))}
@@ -257,7 +236,6 @@ const handleCopy = (id, text) => {
           </div>
         </section>
 
-        {/* Feature Sections & Content Structure */}
         <section className="py-24 px-6 bg-surface-container-low border-y border-outline-variant/40">
           <div className="max-w-[1248px] mx-auto text-center mb-16">
             <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-2">Capabilities</span>
@@ -315,45 +293,6 @@ const handleCopy = (id, text) => {
           </div>
         </div>
       </footer>
-
-      {/* QR Code Modal Rendering */}
-      {qrCodeModal && (
-        <div className="fixed inset-0 bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-surface p-6 rounded-2xl max-w-sm w-full border border-outline-variant shadow-2xl relative text-center">
-            <button onClick={() => setQrCodeModal(null)} className="absolute top-4 right-4 text-on-surface-variant hover:text-primary p-1.5 rounded-full hover:bg-surface-container">
-              <X size={18} />
-            </button>
-            <h3 className="font-display text-lg font-bold text-on-surface mb-2">Link QR Code</h3>
-            <p className="font-sans text-xs text-on-surface-variant mb-6 truncate px-2">{qrCodeModal.short}</p>
-
-            <div className="bg-white p-6 rounded-xl border border-outline-variant inline-block mb-6 shadow-inner mx-auto">
-              <svg className="w-40 h-40 text-on-surface" viewBox="0 0 100 100">
-                <rect width="100" height="100" fill="none" />
-                <path d="M 0 0 h 30 v 30 h -30 z M 10 10 h 10 v 10 h -10 z" fill="currentColor" />
-                <path d="M 70 0 h 30 v 30 h -30 z M 80 10 h 10 v 10 h -10 z" fill="currentColor" />
-                <path d="M 0 70 h 30 v 30 h -30 z M 10 80 h 10 v 10 h -10 z" fill="currentColor" />
-                <path d="M 40 5 h 5 v 5 h -5 z M 50 15 h 10 v 5 h -10 z M 40 25 h 5 v 5 h -5 z M 60 5 h 5 v 10 h -5 z M 55 25 h 5 v 5 h -5 z" fill="currentColor" />
-                <path d="M 5 40 h 5 v 5 h -5 z M 15 45 h 10 v 5 h -10 z M 25 40 h 10 v 5 h -10 z M 10 55 h 5 v 10 h -5 z M 30 55 h 5 v 5 h -5 z" fill="currentColor" />
-                <path d="M 45 45 h 10 v 10 h -10 z M 60 40 h 5 v 15 h -5 z M 55 60 h 10 v 5 h -10 z" fill="currentColor" />
-                <path d="M 75 45 h 10 v 5 h -10 z M 80 55 h 15 v 10 h -15 z M 70 75 h 10 v 5 h -10 z M 90 70 h 5 v 5 h -5 z M 85 85 h 10 v 10 h -10 z M 45 75 h 15 v 15 h -15 z H 35 v -10 h 10 z" fill="currentColor" />
-              </svg>
-            </div>
-
-            <div className="bg-surface-container-low rounded-lg p-3 text-left flex items-start gap-3 border border-outline-variant/50">
-              <CornerDownRight size={16} className="text-primary mt-0.5 shrink-0" />
-              <div>
-                <span className="text-[10px] font-bold text-primary uppercase block">Redirection Target</span>
-                <span className="text-xs text-on-surface-variant font-medium block truncate max-w-[240px]">{qrCodeModal.original}</span>
-              </div>
-            </div>
-
-            <button onClick={() => setQrCodeModal(null)} className="mt-6 w-full py-2.5 bg-primary-container hover:bg-primary text-on-primary font-semibold rounded-lg text-sm transition-colors">
-              Done
-            </button>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
