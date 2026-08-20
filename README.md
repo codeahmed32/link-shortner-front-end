@@ -1,16 +1,25 @@
-# React + Vite
+# URL Shortener - Frontend Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fast, responsive frontend client for the URL Shortener application. Built with React and Tailwind CSS, it provides a clean interface for shortening URLs, managing link redirection, and viewing analytics.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* **Instant Link Shortening:** Input long URLs to generate shortened, shareable links in real-time.
+* **Responsive UI:** Styled with Tailwind CSS for smooth usage on mobile, tablet, and desktop screens.
+* **API Integration:** Connects seamlessly with the Express/MongoDB backend via REST API endpoints.
+* **Clipboard Copying:** One-click functionality to copy generated short links instantly.
+* **Error Handling:** Client-side validation and visual error alerts for invalid URLs.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Framework:** React.js
+* **Styling:** Tailwind CSS
+* **HTTP Client:** Axios / Fetch API
+* **Deployment:** Netlify / Vercel
 
-## Expanding the ESLint configuration
+## ⚙️ Local Setup Instructions
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUR_USERNAME/url-shortener-frontend.git](https://github.com/YOUR_USERNAME/url-shortener-frontend.git)
+   cd url-shortener-frontend
